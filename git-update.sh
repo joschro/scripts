@@ -8,6 +8,8 @@ rpm -q gh || {
   dnf install gh -y
 }
 gh auth status || {
+  gh config set git_protocol https -h github.com
+  gh auth setup-git
   echo -n "Please enter your GitHub access token: "; read ANSW
   echo "$ANSW" | gh auth login --with-token
 }
