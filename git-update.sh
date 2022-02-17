@@ -43,12 +43,12 @@ esac
 gh auth status || {
   gh config set git_protocol https -h github.com
   gh auth setup-git
-  echo -n "Please enter your GitHub access token: "; read ANSW
-  echo "$ANSW" | gh auth login --with-token
+  echo "Make sure to have your GitHub access token entered in ~/.my_gh_token.txt"
+  gh auth login --with-token < ~/.my_gh_token.txt
 }
 
 git pull
 git add -A
 git commit -a
-git push
+git push https://$(cat ~/.my_gh_token.txt)@github.com/joschro/$(basename $PWD).git
 
