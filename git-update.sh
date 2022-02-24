@@ -40,6 +40,11 @@ case "${osPlatform}" in
 			;;
 esac
 
+test -f ~/.my_gh_token.txt || {
+	echo -n "Please enter your GitHub access token: "
+        read ANSWER
+	echo "$ANSWER" > ~/.my_gh_token.txt
+}
 gh auth status || {
   gh config set git_protocol https -h github.com
   gh auth setup-git
