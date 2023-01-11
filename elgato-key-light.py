@@ -1,4 +1,19 @@
-import leglight, getopt, sys
+import sys, getopt
+import subprocess
+import pkg_resources
+
+required  = {'leglight'} 
+#print("required: ",required)
+installed = {pkg.key for pkg in pkg_resources.working_set}
+#print("installed: ",installed)
+missing   = required - installed
+#print("missing: ", *missing)
+
+if missing:
+    # implement pip as a subprocess:
+    subprocess.check_call(['sudo', sys.executable, '-m', 'pip', 'install', *missing])
+
+import leglight
 
 myLight = leglight.LegLight('192.168.178.23',9123)
 print(myLight)
