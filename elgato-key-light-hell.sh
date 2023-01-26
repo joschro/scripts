@@ -1,3 +1,7 @@
 #!/bin/sh
 
-python3 ~/bin/elgato-key-light.py -b 70 -c 3200
+elgato_ip=192.168.178.23
+
+test $# -ge 1 && elgato_ip=$1
+
+python3 ~/bin/elgato-key-light.py -i "$elgato_ip" -b 70 -c 3200
