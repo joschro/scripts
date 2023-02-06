@@ -4,8 +4,14 @@ myDEV=/dev/sda
 
 test $# -gt 1 && myDEV=$2
 
-test -f $1 || exit
-test -e $myDEV || exit
+test -f $1 || {
+	echo "Error: $1 not a file"
+	exit
+}
+test -e $myDEV || {
+	echo "Error: $myDEV does not exit"
+	exit
+}
 
 cat /proc/partitions |grep -v dm- | grep -v nvme
 echo
@@ -15,6 +21,7 @@ ls -lh $1
 echo
 echo "$1" | grep "\.tar\.bz2$" && tar -tvjf "$1"
 echo "$1" | grep "\.tar\.gz$" && tar -tvzf "$1"
+echo "$1" | grep "\.bz2$" && echo "$1" | sed "s/\.bz2//"
 echo "$1" | grep "\.gz$" && gunzip -l "$1"
 echo "$1" | grep "\.xz$" && xzcat -l "$1"
 echo "$1" | grep "\.zip$" && unzip -l "$1"
@@ -32,6 +39,11 @@ echo "$1" | grep "\.tar\.bz2$" && {
 echo "$1" | grep "\.tar\.gz$" && {
 	echo "tar.gz detected"
 	tar -xvzf "$1" -o | dd status=progress bs=4M of=$myDEV && sync;sync;sync
+	exit 0
+}
+echo "$1" | grep "\.bz2$" && {
+	echo "bz2 detected"
+	bunzip2 -dv "$1" -c | dd status=progress bs=4M of=$myDEV && sync;sync;sync
 	exit 0
 }
 echo "$1" | grep "\.gz$" && {
@@ -54,3 +66,5 @@ echo "$1" | grep "\.img$\|\.iso$" && {
 	dd status=progress bs=4M conv=fdatasync if="$1" of=$myDEV && sync;sync;sync
 	exit 0
 }
+
+echo "$1 not a supported format." && exit 1
