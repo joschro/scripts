@@ -10,6 +10,6 @@ ping -c1 -w1 192.168.178.1 >/dev/null && {
 }
 
 ping -c1 -w1 10.93.124.1 >/dev/null && {
-  busylight_ip=10.93.124.8
+  busylight_ip=10.93.124.6
   ping -c1 -w1 $busylight_ip >/dev/null 2>&1 && curl http://$busylight_ip/cm?cmnd=Power%20TOGGLE >/dev/null
 }
