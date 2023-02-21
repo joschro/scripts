@@ -1,3 +1,6 @@
 #!/bin/sh
 
-ip r | grep "10.4.20.0" || ip r add 10.4.20.0/24 via 10.4.110.1 && echo "Route 10.4.20.0/24 via 10.4.110.1 set: $(ip route sh | grep 10.4.20.0)"
+subnet="10.93.124.0"
+router="10.0.2.2"
+echo "ip r | grep "$subnet" || ip r add $subnet/24 via $router"
+ip r | grep "$subnet" || ip r add $subnet/24 via $router && echo "Route $subnet/24 via $router set: $(ip route sh | grep $subnet)"
