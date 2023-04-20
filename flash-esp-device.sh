@@ -29,6 +29,7 @@ test "$ANSW" = "y" && {
 }
 echo -n "To flash new firmware,"
 echo    " disconnect, press the device's connect/reset button, connect FTDI adapter and press"
+echo    "<e> for plain ESP32,"
 echo    "<w> for Wemos D1 mini,"
 echo    "<s> for Sonoff,"
 echo -n "<y> for Shelly"; read ANSW
@@ -38,3 +39,5 @@ test "$ANSW" = "y" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=4
 test "$ANSW" = "s" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=1MB -fm dout 0x0 "$FLASH_FILE"
 # Wemos D1 mini
 test "$ANSW" = "w" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=4MB -fm dio 0 "$FLASH_FILE"
+# ESP32
+test "$ANSW" = "e" && esptool --port $PORT_NAME $BAUD write_flash 0x0 "$FLASH_FILE"

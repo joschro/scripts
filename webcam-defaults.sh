@@ -6,6 +6,11 @@ for I in /dev/video*; do
 	       guvcview -z -d $I -p ~/configs/guvcview-videoconf-c920.gpfl
 	       break
        }
+       v4l2-ctl -D -d $I | grep C922 && {
+	       echo "Webcam found at: $I"
+	       guvcview -z -d $I -p ~/configs/guvcview-videoconf-c922.gpfl
+	       break
+       }
        v4l2-ctl -D -d $I | grep C930e && {
 	       echo "Webcam found at: $I"
 	       guvcview -z -d $I -p ~/configs/guvcview-videoconf-c930e.gpfl
