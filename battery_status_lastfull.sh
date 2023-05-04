@@ -1,5 +1,8 @@
 #!/bin/sh
 
-battCap="$(echo "100 * $(cat /sys/class/power_supply/BAT0/energy_now) / $(cat /sys/class/power_supply/BAT0/energy_full)" | bc)"
-echo -n "$battCap%"
-echo " - $(cat /sys/class/power_supply/BAT0/status)"
+for I in /sys/class/power_supply/BAT*; do
+	battCap="$(echo "100 * $(cat $I/energy_now) / $(cat $I/energy_full)" | bc)"
+	echo -n "Capacity currently against last full $I: "
+	echo -n "$battCap%"
+	echo " - $(cat $I/status)"
+done
