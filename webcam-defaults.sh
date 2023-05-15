@@ -22,5 +22,7 @@ for I in /dev/video*; do
 	       break
        }
 done
-
+echo
+v4l2-ctl --list-devices
+echo
 v4l2-ctl --list-formats
