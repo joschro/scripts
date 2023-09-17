@@ -1,9 +1,11 @@
 #!/bin/sh
 
+echo
 #echo "DEBUG CMDLINE: $0 $*"
 
 internalFind=false
 internalRemove=false
+noDirDiff=false
 case "$1" in
         "--intFind")    {
                 internalFind=true
@@ -15,13 +17,18 @@ case "$1" in
                 shift
         }
         ;;
+	"--noDirDiff")	{
+		noDirDiff=true
+		shift
+	}
+	;;
 esac
 
 
 SRC="$1"
 DST="$2"
 
-#echo "DEBUG: internalFind=$internalFind internalRemove=$internalRemove $0 $*"
+#echo "DEBUG: noDirDiff=$noDirDiff internalFind=$internalFind internalRemove=$internalRemove $0 $*"
 test -L "$SRC" && {
 	echo "$SRC is a symbolic link, check manually!!"
 	exit
@@ -36,10 +43,14 @@ if $internalFind; then
         find "$DST" -type f -name "$(basename "$SRC")" -exec $0 --intRemove "$SRC" "{}" \;
 elif $internalRemove; then
 #       echo "DEBUG: internalRemove $SRC $DST"
-        ls -l "$SRC" "$DST"; diff "$SRC" "$DST" && rm -iv "$SRC"
+        echo;ls -l "$SRC" "$DST"; diff "$SRC" "$DST" && {
+		echo;echo "$(basename "$SRC") in $(dirname "$SRC") and $(dirname "$DST") are identical!"
+		rm -iv "$SRC"
+	}
 else
 #       echo "DEBUG: external $SRC $DST"
-        diff -qr "$SRC" "$DST" && {
+test $noDirDiff == false && diff -qr "$SRC" "$DST" && {
+		echo
                 ls -l "$SRC" "$DST"
                 echo -n "$SRC and $DST are identical - remove $SRC completely? [Y/N] "; read ANSW
                 test "$ANSW" = "Y" && rm -vrf "$SRC"
