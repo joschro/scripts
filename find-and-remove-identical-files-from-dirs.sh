@@ -32,7 +32,6 @@ test -L "$DST" && {
 }
 
 if $internalFind; then
-if $internalFind; then
 #       echo "DEBUG: internalFind $SRC $DST"
         find "$DST" -type f -name "$(basename "$SRC")" -exec $0 --intRemove "$SRC" "{}" \;
 elif $internalRemove; then
