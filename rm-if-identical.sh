@@ -11,4 +11,7 @@ DST="$2"
 
 echo;echo "Comparing $SRC and $DST :"
 ls -l "$SRC" "$DST"
-diff "$SRC" "$DST" && rm -v "$SRC"
+diff "$SRC" "$DST" && {
+	echo -n "$SRC and $DST are identical; remove $SRC [y/n]? "; read ANSW
+	test "$ANSW" = "y" && rm -v "$SRC"
+}
