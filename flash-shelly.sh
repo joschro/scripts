@@ -8,7 +8,7 @@ test $# -gt 1 && PORT_NAME=$2
 
 BAUD="--baud 4800"
 BAUD="--baud 115200"
-BAUD=""
+BAUD="--no-stub"
 #BAUD="--baud 9600"
 
 echo -n "To read chip ID,"

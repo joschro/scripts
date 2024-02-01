@@ -7,10 +7,10 @@ PORT_NAME=/dev/ttyUSB0
 test $# -gt 1 && PORT_NAME=$2
 
 # Wemos D1 mini
-BAUD="--baud 4800"
-#BAUD="--baud 9600"
-#BAUD="--baud 115200"
 BAUD=""
+BAUD="--baud 4800"
+BAUD="--baud 9600"
+BAUD="--baud 115200"
 
 echo -n "To read chip ID,"
 echo -n " disconnect, press the device's connect/reset button, connect FTDI adapter and press <y> "; read ANSW
@@ -41,3 +41,5 @@ test "$ANSW" = "s" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=1
 test "$ANSW" = "w" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=4MB -fm dio 0 "$FLASH_FILE"
 # ESP32
 test "$ANSW" = "e" && esptool --port $PORT_NAME $BAUD write_flash 0x0 "$FLASH_FILE"
+# inkboard based on ESP32
+test "$ANSW" = "i" && esptool --port $PORT_NAME $BAUD --chip esp32 write_flash -z 0x1000 "$FLASH_FILE"
