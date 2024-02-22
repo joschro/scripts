@@ -29,10 +29,9 @@ ping -c1 -w1 192.168.178.1 >/dev/null && {
 }
 
 # office
-ping -c1 -w1 10.93.124.1 >/dev/null && {
-  busylight_ip=10.93.124.154
+for busylight_ip in 10.93.124.4 10.93.124.154; do
   # Tasmota busy lights
   ping -c1 -w1 $busylight_ip >/dev/null 2>&1 && curl --silent http://$busylight_ip/cm?cmnd=Power%20TOGGLE >/dev/null
-}
+done
 
 logger "Videoconf lights toggled."

@@ -40,7 +40,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
             # Using shell=True because simplicity
             # REPLACE this command for your platform or port.
             #val=subprocess.check_output(['lsmod | grep \'^uvcvideo\' | awk \'{print $3}\''], shell=True, text=True).strip()
-            val=subprocess.check_output(['lsof -w /dev/video* | grep -v \”^COMMAND\|^obs\” && echo 1 || echo 0'], shell=True, text=True).strip()
+            val=subprocess.check_output(['lsof -w /dev/video* | grep -v \”^COMMAND\\|^obs\” && echo 1 || echo 0'], shell=True, text=True).strip()
             if val != self.status:
                 self.status = val
                 if val == '0':
