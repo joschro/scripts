@@ -7,12 +7,14 @@ test $# -lt 1 && {
 fritzPassword="$1"
 fritzStation=1
 
+test -f "$(dirname $0)/fritz-repeater.lastStation" && fritzStation="$(cat "$(dirname $0)/fritz-repeater.lastStation")"
+
 test $# -gt 1 && fritzStation="$2"
 echo "Station $fritzStation selected."
 
 fritzURL="fritz.repeater"
-plugIP=""
 
+plugIP=""
 ping -q -c1 -w10 $fritzURL >/dev/null 2>&1 || {
         curl --silent http://$plugIP/cm?cmnd=Power%20OFF >/dev/null
         sleep 5
