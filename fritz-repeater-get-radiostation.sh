@@ -29,4 +29,5 @@ let station=${fritzStation}-1
 fritzStationName="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl -u ":$fritzPassword" "http://$fritzURL/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/WEBRADIO${station}/Name" --silent --connect-timeout 1 2>/dev/null)"
 echo "Station $fritzStationName selected."
 
+test -f "$(dirname $0)/fritz-repeater.lastStation" && test $(cat "$(dirname $0)/fritz-repeater.lastStation") -eq $fritzStation && exit
 echo "$fritzStation" > "$(dirname $0)/fritz-repeater.lastStation"
