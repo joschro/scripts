@@ -20,13 +20,13 @@ plugIP=""
 #}
 
 #fritzStation="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl "http://:${fritzPassword}@fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/NLR/PlayStatus" --silent --connect-timeout 1)"
-fritzStation="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl -u ":${fritzPassword}" 'http://fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/NLR/PlayStatus' --silent --connect-timeout 1)"
+fritzStation="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl -u ":$fritzPassword" 'http://fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/NLR/PlayStatus' --silent --connect-timeout 1)"
 [[ -n "$fritzStation" ]] && [[ $fritzStation -gt 0 ]] || exit
 echo "Station $fritzStation selected."
 
 let station=${fritzStation}-1
 #fritzStationName="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl "http://:${fritzPassword}@fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/WEBRADIO${station}/Name" --silent --connect-timeout 1)"
-fritzStationName="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl -u ":${fritzPassword}" "http://fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/WEBRADIO${station}/Name" --silent --connect-timeout 1)"
+fritzStationName="$(ping -q -c1 -w1 $fritzURL >/dev/null && curl -u ":$fritzPassword" "http://fritz.repeater/cgi-bin/webcm?getpage=../html/query.txt&var:n%5B1%5D=configd:settings/WEBRADIO${station}/Name" --silent --connect-timeout 1)"
 echo "Station $fritzStationName selected."
 
 echo "$fritzStation" > "$(dirname $0)/fritz-repeater.lastStation"
