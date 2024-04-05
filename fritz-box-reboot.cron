@@ -1,1 +1,1 @@
-*/30 * * * * ping -q -c1 -w10 192.168.178.240 && { ping -q -c1 -w10 Kamera-Hauseingang || sh /roo/fritz-box-reboot.sh '08SHO15!' 192.168.178.240; }
+*/30 * * * * ping -q -c1 -w10 192.168.178.240 && { ping -q -c1 -w10 Kamera-Hauseingang || sh /roo/fritz-box-reboot.sh '<PASSWORD>' 192.168.178.240; }
