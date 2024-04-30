@@ -36,3 +36,5 @@ for busylight_ip in 10.93.124.4 10.93.124.154; do
 done
 
 logger "Videoconf lights toggled."
+
+~/bin/webcam-defaults.sh
