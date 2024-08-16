@@ -1,4 +1,4 @@
 #!/bin/sh
 
 networkBase="$1"
-nmap -T5 -sP ${networkBase}.0-255
+sudo nmap -T5 -sP ${networkBase}.0-255
