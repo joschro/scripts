@@ -33,6 +33,7 @@ echo "$1" | grep "\.bz2$" && echo "$1" | sed "s/\.bz2//"
 echo "$1" | grep "\.gz$" && gunzip -l "$1"
 echo "$1" | grep "\.xz$" && xzcat -l "$1"
 echo "$1" | grep "\.zip$" && unzip -l "$1"
+echo "$1" | grep "\.zst$" && zstd -l "$1"
 
 
 echo; echo "to:"
@@ -67,6 +68,11 @@ echo "$1" | grep "\.xz$" && {
 echo "$1" | grep "\.zip$" && {
 	echo "zip detected"
 	unzip -p "$1" | $myDD status=progress bs=4M of=$myDEV && sync;sync;sync
+	exit 0
+}
+echo "$1" | grep "\.zst$" && {
+	echo "zstandard detected"
+	zstd -c -d "$1" | $myDD status=progress bs=4M of=$myDEV && sync;sync;sync
 	exit 0
 }
 echo "$1" | grep "\.img$\|\.iso$" && {

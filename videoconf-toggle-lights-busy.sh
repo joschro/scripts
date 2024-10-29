@@ -29,7 +29,8 @@ ping -c1 -w1 192.168.178.1 >/dev/null && {
 }
 
 # office
-for busylight_ip in 10.93.124.4 10.93.124.154; do
+MACs="A0:20:A6:06:32:A3"
+for busylight_ip in $(~/bin/ip-of-mac.sh "$MACs"); do
   # Tasmota busy lights
   ping -c1 -w1 $busylight_ip >/dev/null 2>&1 && curl --silent http://$busylight_ip/cm?cmnd=Power%20TOGGLE >/dev/null
 done

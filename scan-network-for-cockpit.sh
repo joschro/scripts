@@ -1,6 +1,6 @@
 #/!bin/sh
 
-networks="10.93.124"
+networks="$(ip route |grep default | head -n1|sed "s/.*via //;s/ .*//;s/\(.*\)\..*/\1/")"
 test $# -gt 0 && networks="$*"
 range="3..19"
 for J in $networks; do
