@@ -1,5 +1,10 @@
 #!/bin/sh
 
+test "$USER" = "root" || {
+	echo "Must be root."
+	exit
+}
+
 logFile="/var/log/$(basename $0)"
 currentVersion=$(sed "s/.* \([[:digit:]]*\)\( .*\)/\1/g" /etc/fedora-release)
 (( newVersion = $currentVersion + 1 ))
