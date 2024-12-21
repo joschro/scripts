@@ -14,11 +14,17 @@ test -n "$MACIPs" && echo "$MACIPs" | grep "[0-9]" >/dev/null && {
 }
 
 networkBase="$(ip route |grep default | head -n1|sed "s/.*via //;s/ .*//;s/\(.*\)\..*/\1/")"
-IPs="$(sudo nmap -T5 -sP ${networkBase}.0-255)"
 
+nmap -T3 -sP ${networkBase}.0-255 >/dev/null 2>&1
+IPs="$(arp -n |tr -s " " | cut -d " " -f1,3 | sort -u)"
 for MAC in $*; do
-        MACIPs="${MACIPs}$(echo -n "$IPs" | grep -B2 -i "$MAC" | head -n1 | sed "s/.* //g") "
+        MACIPs="${MACIPs}$(echo -n "$IPs" | grep -i "$MAC" | head -n1 | sed "s/ .*//g") "
 done
+
+#IPs="$(sudo nmap -T3 -sP ${networkBase}.0-255)"
+#for MAC in $*; do
+#        MACIPs="${MACIPs}$(echo -n "$IPs" | grep -B2 -i "$MAC" | head -n1 | sed "s/.* //g") "
+#done
 
 test -n "$MACIPs" && echo "$MACIPs" | grep "[0-9]" >/dev/null && {
        echo "$MACIPs"

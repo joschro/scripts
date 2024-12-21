@@ -4,7 +4,7 @@ networks="$(ip route |grep default | head -n1|sed "s/.*via //;s/ .*//;s/\(.*\)\.
 test $# -gt 0 && networks="$*"
 range="3..19"
 for J in $networks; do
-	for I in {3..19}; do 
+	for I in {3..254}; do 
 		IP="$J.$I"
 		echo $IP
 		curl -sk https://$IP:9090/ | grep var

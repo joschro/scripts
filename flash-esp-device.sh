@@ -8,9 +8,9 @@ test $# -gt 1 && PORT_NAME=$2
 
 # Wemos D1 mini
 BAUD=""
-BAUD="--baud 4800"
-BAUD="--baud 9600"
-BAUD="--baud 115200"
+#BAUD="--baud 4800"
+#BAUD="--baud 9600"
+#BAUD="--baud 115200"
 
 echo -n "To read chip ID,"
 echo -n " disconnect, press the device's connect/reset button, connect FTDI adapter and press <y> "; read ANSW
@@ -32,7 +32,7 @@ echo    " disconnect, press the device's connect/reset button, connect FTDI adap
 echo    "<e> for plain ESP32,"
 echo    "<i> for inkboard based on ESP32,"
 echo    "<w> for Wemos D1 mini,"
-echo    "<s> for Sonoff,"
+echo    "<s> for Sonoff / plain 1MB ESP8266,"
 echo    "<y> for Shelly"; read ANSW
 # Shelly
 test "$ANSW" = "y" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=4MB -fm dout 0x0 "$FLASH_FILE"
