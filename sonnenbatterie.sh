@@ -58,11 +58,10 @@ case $1 in
 			ntfy.sh "$ntfyTopic" "Sonnenbatterie state changed" "SonnenBatterie discharging allowed";
 			;;
 	"status")
-                        ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
+                        ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "OperatingMode\|RemainingCapacity_Wh\|Pac_total_W\|dischargeNotAllowed\|GridFeedIn_W")";
                         ;;
 	*)
 			echo "Unknown command: $1";
 			echo -e "Usage: $0 [--ip <IP>] [--token <API-Token>] <laden|auto|entlade_stop|entlade_ok>";
 esac
 echo
-curl http://192.168.178.116:8080/api/v1/status 2>/dev/null | sed "s/,/\n/g" | grep "OperatingMode\|RemainingCapacity_Wh\|Pac_total_W\|dischargeNotAllowed\|GridFeedIn_W"
