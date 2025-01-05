@@ -46,6 +46,8 @@ case $1 in
 			ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "SonnenBatterie now in auto mode: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
 			;;
 	"entlade_stop")
+			curl -X PUT -d EM_OperatingMode=1 --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/configurations;
+                        echo;
 			curl -X POST --header "$sonnenBattAPIToken" -d "" $sonnenBattAPIUrl/setpoint/discharge/0;
 			echo;
 			ntfy.sh "$ntfyTopic" "Sonnenbatterie state changed" "SonnenBatterie discharging stopped: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
@@ -53,9 +55,9 @@ case $1 in
 	"entlade_ok")
 			curl -X PUT -d EM_OperatingMode=2 --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/configurations;
 			echo;
-			curl -X POST --header "$sonnenBattAPIToken" -d "" $sonnenBattAPIUrl/setpoint/discharge/1;
+			curl -X POST --header "$sonnenBattAPIToken" -d "" $sonnenBattAPIUrl/setpoint/discharge/$chargingPower;
 			echo;
-			ntfy.sh "$ntfyTopic" "Sonnenbatterie state changed" "SonnenBatterie discharging allowed";
+			ntfy.sh "$ntfyTopic" "Sonnenbatterie state changed" "SonnenBatterie discharging allowed: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
 			;;
 	"status")
                         ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "OperatingMode\|RemainingCapacity_Wh\|Pac_total_W\|dischargeNotAllowed\|GridFeedIn_W")";
