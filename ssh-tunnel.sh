@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# make sure to install cronie if you want to use crontabs for keeping the tunnel up
+
 ### make sure that on the remote side there "grep GatewayPort /etc/ssh/sshd_config" results in:
 # #GatewayPorts no
 # GatewayPorts yes
