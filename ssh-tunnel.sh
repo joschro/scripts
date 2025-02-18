@@ -19,4 +19,4 @@ ps aux | grep -v grep | grep "ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest" >/
         kill $(ps aux | grep -v grep | grep "ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest" | tr -s [:blank:] | cut -d" " -f 2 | head -n1)
 }
 
-ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest 
+nohup ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest &
