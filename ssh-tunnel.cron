@@ -1,1 +1,1 @@
-*/5 * * * * sh ssh-tunnel <destination> [port]
+*/5 * * * * sh ssh-tunnel.sh <destination> [port]
