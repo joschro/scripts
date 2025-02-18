@@ -12,4 +12,9 @@ shift
 myPort="55522"
 test $# -gt 0 && myPort="$1"
 
+ps aux | grep "ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest" && {
+	ssh -p $myPort $(echo $myDest | sed "s/.*@//") ps ax | grep "sshd: opc@notty" && exit
+        kill $(ps aux | grep "ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest" | grep -v grep | tr -s [:blank:] | cut -d" " -f 2 | head -n1)
+}
+
 ssh -R 0.0.0.0:$myPort:127.0.0.1:22 -N $myDest 
