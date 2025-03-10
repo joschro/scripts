@@ -1,8 +1,9 @@
 #!/bin/bash
 
-LAT="51.30881647251574"
-LON="6.683780887906319"
-TOPIC="Wasserstr56Info"
+LAT="$(cat ~/Projekte/github/private/location.lat)"
+LON="$(cat ~/Projekte/github/private/location.lon)"
+TOPIC="$(cat ~/Projekte/github/private/ntfy_info.topic)"
+
 
 # Wetterdaten abrufen
 RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LON&daily=sunshine_duration&timezone=Europe/Berlin")
