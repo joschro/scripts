@@ -2,7 +2,7 @@
 
 echo "Download firmware from https://github.com/jomjol/AI-on-the-edge-device/releases/latest"
 filesDir="."
-test $# -gt 1 && filesDir="$1"
+test $# -gt 0 && filesDir="$1"
 test -f "${filesDir}/bootloader.bin" || echo "${filesDir}/bootloader.bin not found"
 test -f "${filesDir}/partitions.bin" || echo "${filesDir}/partitions.bin not found"
 test -f "${filesDir}/firmware.bin" || echo "${filesDir}/firmware.bin not found"

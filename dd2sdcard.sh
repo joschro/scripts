@@ -3,11 +3,11 @@
 myDEV=/dev/sda
 
 myFDISK="sudo fdisk"
-myDD="sudo dd"
+myDD="sudo dd iflag=fullblock oflag=direct"
 
 test "$USER" = "root" && {
 	myFDISK="fdisk"
-	myDD="dd"
+	myDD="dd iflag=fullblock oflag=direct"
 }
 
 test $# -gt 1 && myDEV=$2
@@ -75,7 +75,7 @@ echo "$1" | grep "\.zst$" && {
 	zstd -c -d "$1" | $myDD status=progress bs=4M of=$myDEV && sync;sync;sync
 	exit 0
 }
-echo "$1" | grep "\.img$\|\.iso$" && {
+echo "$1" | grep "\.img$\|\.iso$\|\.raw$" && {
 	echo "raw image detected"
 	$myDD status=progress bs=4M conv=fdatasync if="$1" of=$myDEV && sync;sync;sync
 	exit 0

@@ -5,7 +5,7 @@ sonnenBattIP="192.168.178.116"
 sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2";
 sonnenBattAPIToken="Auth-Token: $(cat ~/Projekte/github/private/api_keys/sonnenbatterie_api_key.txt)"
 chargingPower=4600
-ntfyTopic="$(cat ~/Projekte/github/private/ntfy_home.topic)"
+ntfyTopic="$(cat ~/Projekte/github/private/ntfy_info.topic)"
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
 while [ $# -gt 1 ]; do
