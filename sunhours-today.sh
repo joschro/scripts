@@ -9,10 +9,10 @@ TOPIC="$(cat ~/Projekte/github/private/ntfy_info.topic)"
 RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LON&daily=sunshine_duration&timezone=Europe/Berlin")
 
 # Sonnenstunden für morgen extrahieren
-SUN_MINS=$(echo $RESPONSE | jq '.daily.sunshine_duration[1]')
+SUN_MINS=$(echo $RESPONSE | jq '.daily.sunshine_duration[0]')
 SUN_HOURS="$(echo $SUN_MINS / 3600 | bc)"
 
 # Nachricht an ntfy.sh senden
-MESSAGE="Sonnenstunden morgen: $SUN_HOURS Stunden ☀️"
-curl -s -d "$MESSAGE" "https://ntfy.sh/$TOPIC" >/dev/null
+MESSAGE="Sonnenstunden heute: $SUN_HOURS Stunden ☀️"
+echo "$MESSAGE"
 
