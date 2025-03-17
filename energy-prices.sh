@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setze deinen API-Key hier
-API_KEY="4b8479ae-a1c6-4a44-9608-f0166dcb6094"
+API_KEY="$(~/Projekte/github/private/entsoe-apikey.txt)"
 
 # Setze die Marktzonen-ID für dein Land (z.B. "10YDE-VE-------2" für Deutschland)
 MARKET_AREA="10YDE-VE-------2"
