@@ -26,7 +26,7 @@ ping -q -c1 -w1 $fritzURL >/dev/null && echo "$fritzURL reachable" && curl http:
 
 # Klassik Radio		1	http://stream.klassikradio.de/live/mp3-192/stream.klassikradio.de
 # Antenne Düsseldorf	2	http://mp3.antennedus.c.nmdn.net/antennedus/livestream.mp3
-# 1 LIVE		3	http://mp3.antennedus.c.nmdn.net/antennedus/livestream.mp3
+# 1 LIVE		3	http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3
 # Fritz			4	http://www.fritz.de/live.m3u
 # NEWS 89.4		5	http://stream.news894.de/444z5xy
 # New York WNYC		6	http://wnycfm.streamguys.com/wnycfm.aac
