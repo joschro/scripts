@@ -23,6 +23,9 @@ case $DAY in
 	"week"|"woche")
 		dayNumber="$(echo {0..6})";
 		;;
+	"next6d"|"nächste6tage")
+		dayNumber="$(echo {1..6})";
+		;;
 	*)
 		exit
 esac
