@@ -6,10 +6,21 @@
 # #GatewayPorts no
 # GatewayPorts yes
 
-test $# -gt 0 && {
-	myDest="$1"
-	shift
+test $# -lt 1 && {
+	echo "$0 <host> [port on host (55522)] [local port (22)] [local ip address (127.0.0.1)]"
+	echo
+	cat <EOF
+# make sure to install cronie if you want to use crontabs for keeping the tunnel up
+
+### make sure that on the remote side there "grep GatewayPort /etc/ssh/sshd_config" results in:
+# #GatewayPorts no
+# GatewayPorts yes
+	EOF
+	exit
 }
+
+myDest="$1"
+shift
 ssh $myDest sudo grep GatewayPort /etc/ssh/sshd_config | grep yes || exit
 myPort="55522"
 test $# -gt 0 && {
