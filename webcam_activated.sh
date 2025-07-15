@@ -16,4 +16,6 @@ for busylight_ip in $(~/bin/ip-of-mac.sh "$MACs"); do
   busy-lights.sh on $busylight_ip
 done
 
-logger "Videoconf lights off."
+logger "Videoconf lights on."
+
+webcam-defaults.sh
