@@ -1,9 +1,16 @@
 #!/bin/sh
 
-myApiKey="$(cat ~/Projekte/github/private/api_keys/sonnenbatterie_api_key.txt)"
-myMQTTBroker="$(cat ~/Projekte/github/private/sho-mosquitto.host)"
-myMQTTBrokerUser="$(cat ~/Projekte/github/private/sho-mosquitto.user)"
-myMQTTBrokerPwd="$(cat ~/Projekte/github/private/sho-mosquitto.pwd)"
+test $# -lt 1 && {
+        echo "Syntax: $0 <path-to-config>"
+        exit
+}
+
+myApiKey="$(cat $1/api_keys/sonnenbatterie_api_key.txt)"
+myMQTTBroker="$(cat $1/sho-mosquitto.host)"
+myMQTTBrokerUser="$(cat $1/sho-mosquitto.user)"
+myMQTTBrokerPwd="$(cat $1/sho-mosquitto.pwd)"
+shift
+
 mySonnenBatterieIP="192.168.178.116"
 # 5%=1163Wh 100%=10642Wh
 # 5%=1300Wh 100%=10642Wh

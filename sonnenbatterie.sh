@@ -1,6 +1,6 @@
 #!/bin/sh
 
-test $# -lt 1 && { echo -e "Usage: $0 [--ip <IP>] [--token <API-Token>] <laden|auto|entlade_stop|entlade_ok>"; exit; }
+test $# -lt 1 && { echo -e "Usage: $0 [--ip <IP>] [--token <API-Token>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
 sonnenBattIP="192.168.178.116"
 sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2";
 sonnenBattAPIToken="Auth-Token: $(cat ~/Projekte/github/private/api_keys/sonnenbatterie_api_key.txt)"
