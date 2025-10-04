@@ -1,11 +1,12 @@
 #!/bin/sh
 
-test $# -lt 1 && { echo -e "Usage: $0 [--ip <IP>] [--token <API-Token>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
+test $# -lt 1 && { echo -e "Usage: $0 <path-to-config> [--ip <IP>] [--token <API-Token>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
 sonnenBattIP="192.168.178.116"
-sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2";
-sonnenBattAPIToken="Auth-Token: $(cat ~/Projekte/github/private/api_keys/sonnenbatterie_api_key.txt)"
+sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2"
+sonnenBattAPIToken="Auth-Token: $(cat $1/api_keys/sonnenbatterie_api_key.txt)"
 chargingPower=4600
-ntfyTopic="$(cat ~/Projekte/github/private/ntfy_info.topic)"
+ntfyTopic="$(cat $1/ntfy_info.topic)"
+shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
 while [ $# -gt 1 ]; do
@@ -20,7 +21,7 @@ while [ $# -gt 1 ]; do
 		"--token")
                         shift;
                         test "$#" -lt 1 && { echo "Missing parameter, exiting."; exit;};
-                        sonnenBattAPIToken="$1";
+                        sonnenBattAPIToken="Auth-Token: $1";
 			shift;
                         ;;
 		*)
@@ -38,7 +39,7 @@ case $1 in
 			echo;
 			curl -X POST --header "$sonnenBattAPIToken" -d "" $sonnenBattAPIUrl/setpoint/charge/$chargingPower;
 			echo;
-			ntfy.sh "$ntfyTopic" "SonnenBatterie now charging with ${chargingPower}W: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
+			ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "SonnenBatterie now charging with ${chargingPower}W: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge")";
 			;;
 	"auto")
 			curl -X PUT -d EM_OperatingMode=2 --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/configurations;
