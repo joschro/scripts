@@ -5,16 +5,18 @@ test $# -lt 3 && {
         exit
 }
 
-myApiKey="$(cat $1/api_keys/sonnenbatterie_api_key.txt)"
-myMQTTBroker="$(cat $1/sho-mosquitto.host)"
-myMQTTBrokerUser="$(cat $1/sho-mosquitto.user)"
-myMQTTBrokerPwd="$(cat $1/sho-mosquitto.pwd)"
+myConfigPath="$1"
+myApiKey="$(cat $myConfigPath/api_keys/sonnenbatterie_api_key.txt)"
+myMQTTBroker="$(cat $myConfigPath/sho-mosquitto.host)"
+myMQTTBrokerUser="$(cat $myConfigPath/sho-mosquitto.user)"
+myMQTTBrokerPwd="$(cat $myConfigPath/sho-mosquitto.pwd)"
 shift
 
 myTopic="$1"
 shift
 
-myMessage="$(curl --output - -s -u admin:"$1" http://192.168.178.214/data.json?node_id=1 | python3.9 /root/pysmlparser.py | grep Total)"
+myMessage="~/bin/pysmlparser.py not available."
+test -f ~/bin/pysmlparser.py && myMessage="$(curl --output - -s -u admin:"$1" http://192.168.178.214/data.json?node_id=1 | python3.9 ~/bin/pysmlparser.py | grep Total)"
 
 shift
 test "$1" = "ntfy" && ~/bin/ntfy.sh "$myTopic" "Stromzählerstände Tibber Pulse" "$myMessage"
