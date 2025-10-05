@@ -2,6 +2,8 @@
 
 test $# -lt 1 && {
 	echo "No password provided. Exiting"
+	echo
+	echo "Syntax: $0 <password> [<ip or name of Fritz!Box>]"
 	exit
 }
 fritzPassword="$1"
