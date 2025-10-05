@@ -9,8 +9,10 @@ test $# -lt 1 && {
 fritzPassword="$1"
 shift
 
+fritzStationDir="$(dirname $0)"
+fritzStationDir="~/"
 fritzStation=1
-test -f "$(dirname $0)/fritz-repeater.lastStation" && fritzStation="$(cat "$(dirname $0)/fritz-repeater.lastStation")"
+test -f "$fritzStationDir/fritz-repeater.lastStation" && fritzStation="$(cat "$fritzStationDir/fritz-repeater.lastStation")"
 test $# -gt 0 && test $1 -ge 0 && fritzStation="$1" && shift
 echo "Station $fritzStation selected."
 
