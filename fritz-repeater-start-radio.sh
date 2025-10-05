@@ -2,23 +2,26 @@
 
 test $# -lt 1 && {
 	echo "No password provided. Exiting"
+	echo
+	echo "Syntax: $0 <password> [<number-of-radiostation>] [<URL of FritzRepeater>]"
 	exit
 }
 fritzPassword="$1"
+shift
+
 fritzStation=1
-
 test -f "$(dirname $0)/fritz-repeater.lastStation" && fritzStation="$(cat "$(dirname $0)/fritz-repeater.lastStation")"
-
-test $# -gt 1 && fritzStation="$2"
+test $# -gt 0 && test $1 -ge 0 && fritzStation="$1" && shift
 echo "Station $fritzStation selected."
 
-fritzURL="fritz.repeater"
+test $# -gt 0 && fritzURL="$1"
+ping -q -c1 -w10 $fritzURL >/dev/null 2>&1 || fritzURL="fritz.repeater"
 
-plugIP=""
-ping -q -c1 -w10 $fritzURL >/dev/null 2>&1 || {
-        curl --silent http://$plugIP/cm?cmnd=Power%20OFF >/dev/null
+tasmotaPlugIP=""
+test -n "$tasmotaPlugIP" && ping -q -c1 -w10 $fritzURL >/dev/null 2>&1 || {
+        curl --silent http://$tasmotaPlugIP/cm?cmnd=Power%20OFF >/dev/null
         sleep 5
-        curl --silent http://$plugIP/cm?cmnd=Power%20ON >/dev/null
+        curl --silent http://$tasmotaPlugIP/cm?cmnd=Power%20ON >/dev/null
         sleep 30
 }
 
