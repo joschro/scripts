@@ -1,9 +1,21 @@
 #!/bin/bash
 
-LAT="$(cat ~/Projekte/github/private/location.lat)"
-LON="$(cat ~/Projekte/github/private/location.lon)"
-TOPIC="$(cat ~/Projekte/github/private/ntfy_info.topic)"
+test $# -lt 1 && {
+        echo "Syntax: $0 <path-to-config> [-ntfy]"
+        exit
+}
 
+myConfigPath="$1"
+shift
+
+test "$1" = "-nontfy" && {
+        noNtfy=true
+        shift
+}
+
+LAT="$(cat $myConfigPath/location.lat)"
+LON="$(cat $myConfigPath/location.lon)"
+TOPIC="$(cat $myConfigPath/ntfy_info.topic)"
 
 # Wetterdaten abrufen
 RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LON&daily=sunshine_duration&timezone=Europe/Berlin")
@@ -15,4 +27,4 @@ SUN_HOURS="$(echo $SUN_MINS / 3600 | bc)"
 # Nachricht an ntfy.sh senden
 MESSAGE="Sonnenstunden heute: $SUN_HOURS Stunden ☀️"
 echo "$MESSAGE"
-
+test $noNtfy || curl -s -d "$MESSAGE" "https://ntfy.sh/$TOPIC" >/dev/null

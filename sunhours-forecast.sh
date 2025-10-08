@@ -1,13 +1,21 @@
 #!/bin/bash
 
+test $# -lt 2 && {
+        echo "Syntax: $0 <path-to-config> [-ntfy] <today|tomorrow|week|next6d>"
+        exit
+}
+
+myConfigPath="$1"
+shift
+
 test "$1" = "-nontfy" && {
 	noNtfy=true
 	shift
 }
 
-LAT="$(cat ~/Projekte/github/private/location.lat)"
-LON="$(cat ~/Projekte/github/private/location.lon)"
-TOPIC="$(cat ~/Projekte/github/private/ntfy_info.topic)"
+LAT="$(cat $myConfigPath/location.lat)"
+LON="$(cat $myConfigPath/location.lon)"
+TOPIC="$(cat $myConfigPath/ntfy_info.topic)"
 DAY="$1"
 
 case $DAY in 
