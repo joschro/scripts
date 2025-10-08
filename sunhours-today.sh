@@ -25,6 +25,7 @@ SUN_MINS=$(echo $RESPONSE | jq '.daily.sunshine_duration[0]')
 SUN_HOURS="$(echo $SUN_MINS / 3600 | bc)"
 
 # Nachricht an ntfy.sh senden
-MESSAGE="Sonnenstunden heute: $SUN_HOURS Stunden ☀️"
+MESSAGE="Sonnenstunden heute: $SUN_HOURS"
+test $SUN_HOURS -gt 0 && MESSAGE="$MESSAGE ☀️"
 echo "$MESSAGE"
 test $noNtfy || curl -s -d "$MESSAGE" "https://ntfy.sh/$TOPIC" >/dev/null

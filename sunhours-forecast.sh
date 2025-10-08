@@ -47,7 +47,8 @@ for I in $dayNumber; do
         SUN_MINS=$(echo $RESPONSE | jq ".daily.sunshine_duration[$I]")
         SUN_HOURS="$(echo $SUN_MINS / 3600 | bc)"
 
-	MESSAGE="$(echo -e "$MESSAGE\nSonnenstunden $SUN_DAY: $SUN_HOURS Stunden ☀️")"
+	MESSAGE="$(echo -e "$MESSAGE\nSonnenstunden $SUN_DAY: $SUN_HOURS")"
+	test $SUN_HOURS -gt 0 && MESSAGE="$MESSAGE ☀️"
 done
 # Nachricht an ntfy.sh senden
 test $noNtfy || curl -s -d "$MESSAGE" "https://ntfy.sh/$TOPIC" >/dev/null
