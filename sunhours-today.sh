@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test $# -lt 1 && {
-        echo "Syntax: $0 <path-to-config> [-ntfy]"
+        echo "Syntax: $0 <path-to-config> [-nontfy]"
         exit
 }
 
