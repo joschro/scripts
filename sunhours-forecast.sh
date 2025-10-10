@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test $# -lt 2 && {
-        echo "Syntax: $0 <path-to-config> [-ntfy] <today|tomorrow|week|next6d>"
+        echo "Syntax: $0 <path-to-config> [-nontfy] <today|tomorrow|week|next6d>"
         exit
 }
 
@@ -35,6 +35,9 @@ case $DAY in
 		dayNumber="$(echo {1..6})";
 		;;
 	*)
+		echo "Error: unknown parameter \"$DAY\". Exiting."
+        	echo
+		echo "Syntax: $0 <path-to-config> [-nontfy] <today|tomorrow|week|next6d>"
 		exit
 esac
 
