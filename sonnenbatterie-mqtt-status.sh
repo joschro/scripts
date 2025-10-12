@@ -15,7 +15,8 @@ mySonnenBatterieIP="192.168.178.116"
 # 5%=1163Wh 100%=10642Wh
 # 5%=1300Wh 100%=10642Wh
 cap100=10642
-cap5=1300
+percentLow=3
+capLow=1347
 
 myTopic="sonnenbatterie/RemainingCapacity_kWh"
 myMessage="$(curl -s --header "Auth-Token: $myApiKey" http://${mySonnenBatterieIP}:80/api/v2/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh"|sed "s/.*://g")"
@@ -26,12 +27,12 @@ echo "Remaining Capacity (Wh): $myMessage of $cap100"
 
 myTopic="sonnenbatterie/RemainingCapacity_%"
 # f(x) = a * x + b
-# a = (100-5) / ($cap100 - $cap5)
+# a = (100-5) / ($cap100 - $capLow)
 # b = 100 - a * $cap100
 # f(x) = 0,0100221542357 * x - 6,65576537632
 # f(x) = 0,0101691286662 * x - 8,2198672657
 #myMessage="$(echo "scale=14; $myMessage / $cap100 * 100" | bc -l | xargs printf "%.0f\n")"
-myMessage="$(echo "scale=14; 100 + ($myMessage - $cap100) * 95 / ($cap100 - $cap5)" | bc -l | xargs printf "%.0f\n")"
+myMessage="$(echo "scale=14; 100 + ($myMessage - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")"
 echo "Remaining Capacity (%): $myMessage"
 
 mosquitto_pub -h $myMQTTBroker -u $myMQTTBrokerUser -P "$myMQTTBrokerPwd" -t "$myTopic" -m "$myMessage"
