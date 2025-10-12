@@ -10,7 +10,7 @@ ntfyTopic="$(cat $1/ntfy_info.topic)"
 myDuration=0
 myLoadLimit=100
 cap100=10642
-cap5=1300
+cap5=1347
 shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
