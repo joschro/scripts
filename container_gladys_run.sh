@@ -2,6 +2,7 @@
 
 alias docker=podman
 sudo mkdir -p /var/lib/gladysassistant && sudo chown $USER:$USER /var/lib/gladysassistant
+#mkdir ~/gladys_data
 
 docker run -d \
 --log-driver json-file \
