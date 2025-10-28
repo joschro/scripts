@@ -1,14 +1,14 @@
 #!/bin/bash
 
 test $# -lt 1 && {
-        echo "Syntax: $0 <path-to-config> [-nontfy]"
+        echo "Syntax: $0 <path-to-config> [--nontfy]"
         exit
 }
 
 myConfigPath="$1"
 shift
 
-test "$1" = "-nontfy" && {
+test "$1" = "--nontfy" && {
         noNtfy=true
         shift
 }
