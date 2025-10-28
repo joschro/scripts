@@ -11,7 +11,7 @@ myDuration=0
 myLoadLimit=100
 cap100=10642
 percentLow=3
-capLow=1347
+capLow=1545
 shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
