@@ -11,4 +11,4 @@ echo $percentGoal
 echo $percentNow
 echo $percentDiff
 echo $numberOfQuarterlyHours
-at "$(sh ~/bin/tibber-fetch-prices.sh $1 $numberOfQuarterlyHours) <<< \"sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden\""
+echo at "\"$(sh ~/bin/tibber-fetch-prices.sh $1 $numberOfQuarterlyHours)\" <<< \"sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden\""
