@@ -5,6 +5,11 @@ test $# -lt 2 && {
         exit
 }
 
+test -d $1 || {
+        echo "Syntax: $0 <path-to-config> [--nontfy] <today|tomorrow|week|next6d>"
+        exit
+}
+
 myConfigPath="$1"
 shift
 
@@ -37,7 +42,7 @@ case $DAY in
 	*)
 		echo "Error: unknown parameter \"$DAY\". Exiting."
         	echo
-		echo "Syntax: $0 <path-to-config> [-nontfy] <today|tomorrow|week|next6d>"
+		echo "Syntax: $0 <path-to-config> [--nontfy] <today|tomorrow|week|next6d>"
 		exit
 esac
 

@@ -5,6 +5,11 @@ test $# -lt 1 && {
         exit
 }
 
+test -d $1 || {
+        echo "Syntax: $0 <path-to-config> [--nontfy]"
+        exit
+}
+
 myConfigPath="$1"
 shift
 

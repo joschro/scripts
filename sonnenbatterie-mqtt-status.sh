@@ -5,6 +5,9 @@ test $# -lt 1 && {
         exit
 }
 
+sh ~/bin/sonnenbatterie.sh "$1" --mqtt --nontfy status
+exit
+
 myApiKey="$(cat $1/api_keys/sonnenbatterie_api_key.txt)"
 myMQTTBroker="$(cat $1/sho-mosquitto.host)"
 myMQTTBrokerUser="$(cat $1/sho-mosquitto.user)"
@@ -16,12 +19,13 @@ mySonnenBatterieIP="192.168.178.116"
 # 5%=1300Wh 100%=10642Wh
 cap100=10642
 percentLow=3
-capLow=1347
+capLow=1254
 
 myTopic="sonnenbatterie/RemainingCapacity_kWh"
 myMessage="$(curl -s --header "Auth-Token: $myApiKey" http://${mySonnenBatterieIP}:80/api/v2/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh"|sed "s/.*://g")"
 echo "RemainingCapacity_Wh: $myMessage"
 myMessage="$(echo "scale=3; $myMessage / 2" | bc -l)"
+
 mosquitto_pub -h $myMQTTBroker -u $myMQTTBrokerUser -P "$myMQTTBrokerPwd" -t "$myTopic" -m "$(echo "scale=5; $myMessage / 1000" | bc -l)"
 echo "Remaining Capacity (Wh): $myMessage of $cap100"
 
