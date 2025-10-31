@@ -97,6 +97,8 @@ datetime_iso=$(echo "$response" | jq --arg now "$now" --argjson win $window '
 ' | tr -d '"')
 
 # ISO-Zeit in „at“-kompatibles Format umwandeln: „HH:MM YYYY-MM-DD“
-datetime_at=$(date -d "$datetime_iso" '+%H:%M %Y-%m-%d')
+#datetime_at=$(date -d "$datetime_iso" '+%H:%M %Y-%m-%d')
+# [CC]YYMMDDhhmm
+datetime_at=$(date -d "$datetime_iso" '+%Y%m%d%H%M')
 
 echo "$datetime_at"

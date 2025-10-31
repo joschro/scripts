@@ -1,6 +1,6 @@
 #!/bin/sh
 
-test $# -lt 2 && { echo -e "Usage: $0 <path-to-config> [--mqtt] [--nontfy] [--ip <IP>] [--token <API-Token>] [--duration <duration(minutes)>] [--until <percent>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
+test $# -lt 2 && { echo -e "Usage: $0 <path-to-config> [-v] [--mqtt] [--nontfy] [--ip <IP>] [--token <API-Token>] [--duration <duration(minutes)>] [--until <percent>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
 configPath="$1"
 sonnenBattIP="192.168.178.116"
 sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2"
@@ -11,13 +11,17 @@ ntfyTopic="$(cat $configPath/ntfy_info.topic)"
 myDuration=0
 myLoadLimit=100
 cap100=10642
-percentLow=3
-capLow=1254
+percentLow=6
+capLow=1198
 shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
 while [ $# -gt 1 ]; do
 	case "$1" in
+		"-v")
+			shift;
+			verbose=true;
+                        ;;
 		"--mqtt")
 			shift;
 			myMQTTBroker="$(cat $configPath/sho-mosquitto.host)"
@@ -60,7 +64,7 @@ while [ $# -gt 1 ]; do
 	esac
 done
 
-echo "sonnenBattAPIUrl=$sonnenBattAPIUrl sonnenBattAPIToken=$sonnenBattAPIToken"
+#echo "sonnenBattAPIUrl=$sonnenBattAPIUrl sonnenBattAPIToken=$sonnenBattAPIToken"
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
 case $1 in
@@ -126,7 +130,7 @@ case $1 in
 			;;
 	"status")
 			statusMessage="$(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/\"//g;s/\}//g;s/,/\n/g") $(echo -e "\nRemainingCapacity_%:")$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%";
-			echo "---";echo -e "$statusMessage"; echo "---"
+			test $verbose && { echo "---";echo -e "$statusMessage"; echo "---"; }
 			test $doMqtt && {
 				myTopic="sonnenbatterie/RemainingCapacity_kWh"
 				mqttMessage="$(echo -e "$statusMessage" | grep -i "RemainingCapacity_Wh"|sed "s/.*://g")"
@@ -142,7 +146,7 @@ case $1 in
 					mosquitto_pub -h $myMQTTBroker -u $myMQTTBrokerUser -P "$myMQTTBrokerPwd" -t "$myTopic" -m "$mqttMessage"
 				done
 			}
-			statusMessage="$(echo -e "$statusMessage" | grep -i "OperatingMode\|RemainingCapacity_Wh\|Pac_total_W\|dischargeNotAllowed\|GridFeedIn_W")"
+			statusMessage="$(echo -e "$statusMessage" | grep -i "OperatingMode\|RemainingCapacity\|Pac_total_W\|dischargeNotAllowed\|GridFeedIn_W")"
 			test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage";
 			test $noNtfy && echo -e "$statusMessage";
                         #echo "$(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh")";
