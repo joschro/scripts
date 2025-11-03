@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test $# -lt 1 && { echo -e "Usage: $0 <path-to-config>"; exit; }
+test $# -lt 1 && { echo -e "Usage: $0 <path-to-config> [<time window>]"; exit; }
 API_TOKEN="$(cat $1/api_keys/tibber_token.txt)"
 HOME_ID="$(cat $1/tibber_home_id.txt)"
 
@@ -50,7 +50,9 @@ response=$(curl -s \
 #  | {min_price: .total, time: .startsAt}
 #'
 
-now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+#now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+#now=$(date +"%Y-%m-%dT%H:%M:%SZ")
+now=$(date -Iseconds)
 #echo "$response" | jq --arg now "$now" '
 #  [
 #    .data.viewer.home.currentSubscription.priceInfo.today[],
@@ -77,13 +79,15 @@ now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 #'
 
 window=12
-test $# -gt 1 && window=$2
-datetime_iso=$(echo "$response" | jq --arg now "$now" --argjson win $window '
+test $# -gt 1 && window="$2"
+end_time="$(date -d "$now + 11 hours" -Iseconds)"
+#end_time="$(date -d "$now + 11 hours" +"%Y-%m-%dT%H:%M:%SZ")"
+datetime_iso=$(echo "$response" | jq --arg now "$now" --arg end_time "$end_time" --argjson win $window '
   [
     .data.viewer.home.currentSubscription.priceInfo.today[], 
     .data.viewer.home.currentSubscription.priceInfo.tomorrow[]?
   ]
-  | map(select(.startsAt > $now))
+  | map(select(.startsAt > $now and .startsAt < $end_time))
   | . as $arr
   | $arr | length as $len
   | [range(0; $len - $win + 1)
@@ -95,6 +99,23 @@ datetime_iso=$(echo "$response" | jq --arg now "$now" --argjson win $window '
   | min_by(.sum)
   | .start
 ' | tr -d '"')
+
+#echo "--- debug ---"
+#echo "window: $window"
+#echo "---"
+#echo "datetime_iso: $datetime_iso"
+#echo "---"
+#echo "now: $now"
+#echo "end_time: $end_time"
+#echo "---"
+#echo "$response" | jq --arg now "$now" --arg end_time "$end_time" --argjson win $window '
+#  [
+#    .data.viewer.home.currentSubscription.priceInfo.today[],
+#    .data.viewer.home.currentSubscription.priceInfo.tomorrow[]?
+#  ]
+#  | map(select(.startsAt > $now and .startsAt < $end_time))
+#' | tr -d '"'
+#echo "--- /debug ---"
 
 # ISO-Zeit in „at“-kompatibles Format umwandeln: „HH:MM YYYY-MM-DD“
 #datetime_at=$(date -d "$datetime_iso" '+%H:%M %Y-%m-%d')
