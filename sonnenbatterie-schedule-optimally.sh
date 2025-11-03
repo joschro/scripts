@@ -48,8 +48,14 @@ numberOfQuarterlyHours="$(echo "scale=0; $percentDiff / 10" | bc -l)"
 #echo percentDiff=$percentDiff
 #echo numberOfQuarterlyHours=$numberOfQuarterlyHours
 #runCMD="$(echo at "\"$(sh ~/bin/tibber-fetch-prices.sh $configPath $numberOfQuarterlyHours)\" <<< \'sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden\'")"
+timeStart="$(sh ~/bin/tibber-fetch-prices.sh $configPath $numberOfQuarterlyHours)"
+echo $timeStart
+timeNow="$(date '+%Y%m%d%H%M')"
+echo $timeNow
+timeDiff="$(echo "$timeStart - $timeNow" | bc)"
+echo $timeDiff
 runCMD="$(echo \"echo "sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden" \| at -t \"$(sh ~/bin/tibber-fetch-prices.sh $configPath $numberOfQuarterlyHours)\"\")"
-echo "sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden" | at -t "$(sh ~/bin/tibber-fetch-prices.sh $configPath $numberOfQuarterlyHours)"
+#echo "sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden" | at -t "$(sh ~/bin/tibber-fetch-prices.sh $configPath $numberOfQuarterlyHours)"
 echo $runCMD
-${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "\"$runCMD\""
+#${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "\"$runCMD\""
 #$runCMD
