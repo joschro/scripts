@@ -78,7 +78,7 @@ now=$(date -Iseconds)
 #    end
 #'
 
-window=12
+window=8
 test $# -gt 1 && window="$2"
 end_time="$(date -d "$now + 11 hours" -Iseconds)"
 #end_time="$(date -d "$now + 11 hours" +"%Y-%m-%dT%H:%M:%SZ")"

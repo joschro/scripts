@@ -10,9 +10,9 @@ ntfyPath=~/bin
 ntfyTopic="$(cat $configPath/ntfy_info.topic)"
 myDuration=0
 myLoadLimit=100
-cap100=10642
-percentLow=6
-capLow=1198
+cap100=10500
+percentLow=5
+capLow=1194
 shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
