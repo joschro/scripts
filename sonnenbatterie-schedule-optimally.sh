@@ -70,7 +70,7 @@ test $percentGoal -gt 95 && percentGoal=95
 echo percentGoal=$percentGoal
 test $percentDiff -lt 1 && { echo "percentGoal ($percentGoal) is less than percentNow ($percentNow), nothing to do."; exit; }
 #exit
-runCMD="echo \"sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --until $percentGoal laden\" | at -t $timeStart"
+runCMD="echo \"sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --wbec 192.168.178.102 --until $percentGoal laden\" | at -t $timeStart"
 echo "$runCMD"
 eval "$runCMD"
 ${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "$(echo $runCMD | sed "s/\"//g")"

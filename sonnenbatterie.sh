@@ -1,6 +1,6 @@
 #!/bin/sh
 
-test $# -lt 2 && { echo -e "Usage: $0 <path-to-config> [-v] [--mqtt] [--nontfy] [--ip <IP>] [--token <API-Token>] [--duration <duration(minutes)>] [--until <percent>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
+test $# -lt 2 && { echo -e "Usage: $0 <path-to-config> [-v] [--mqtt] [--nontfy] [--ip <IP>] [--token <API-Token>] [--wbec <IP>] [--duration <duration(minutes)>] [--until <percent>] <laden|auto|entlade_stop|entlade_ok|status>"; exit; }
 configPath="$1"
 sonnenBattIP="192.168.178.116"
 sonnenBattAPIUrl="http://$sonnenBattIP:80/api/v2"
@@ -11,14 +11,17 @@ ntfyTopic="$(cat $configPath/ntfy_info.topic)"
 myDuration=0
 myLoadLimit=100
 cap100=10500
-percentLow=5
-capLow=1194
+percentLow=4
+capLow=1551
+WBEC=false
+WBEC_IP="192.168.178.102"
 shift
 
 test $# -lt 1 && { echo "Parameter missing. Exiting."; exit;}
 while [ $# -gt 1 ]; do
 	case "$1" in
 		"-v")
+			echo "Command issued: $0 $*";
 			shift;
 			verbose=true;
                         ;;
@@ -58,6 +61,13 @@ while [ $# -gt 1 ]; do
                         myLoadLimit="$1";
                         shift;
                         ;;
+		"--wbec")
+			shift;
+			WBEC=true;
+			test "$#" -lt 1 && { echo "Missing parameter, exiting."; exit;};
+			WBEC_IP="$1";
+			shift;
+			;;
 		*)
 			echo "Using default params.";
 			continue;
@@ -80,27 +90,41 @@ case $1 in
 			}
 			test $myDuration -gt 0 && {
 				statusMessage="SonnenBatterie now charging with ${chargingPower}W for $myDuration minutes: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge") RemainingCapacity_%:$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%"
-				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage";
-				test $noNtfy && echo -e "$statusMessage";
+				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage"
+				test $noNtfy && echo -e "$statusMessage"
 				sleep $(echo "$myDuration * 60" | bc -l)
-				curl -X PUT -d EM_OperatingMode=2 --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/configurations
-	                        echo
-			        statusMessage="SonnenBatterie now in auto mode: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge") RemainingCapacity_%:$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%"
-        	                test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage";
-				test $noNtfy && echo -e "$statusMessage";
+				statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
+				OPTIONS="--nontfy"
+				test $verbose && OPTIONS="-v $OPTIONS"
+				test $WBEC = true && until [ $(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '(.box[0].power | tonumber) > 0 and (.box[1].power | tonumber) > 0') ]; do
+					sh $0 $configPath $OPTIONS entlade_stop
+					sleep 60
+				done
+				OPTIONS=""
+				test $noNtfy && OPTIONS="--nontfy"
+				test $verbose && OPTIONS="-v $OPTIONS"
+				sh $0 $configPath $OPTIONS auto
 			};
 			test $myLoadLimit -lt 100 && {
 				statusMessage="SonnenBatterie now charging with ${chargingPower}W until ${myLoadLimit}%: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge") RemainingCapacity_%:$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%"
-				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage";
-				test $noNtfy && echo -e "$statusMessage";
+				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage"
+				test $noNtfy && echo -e "$statusMessage"
 				until [ $(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n") -ge $myLoadLimit ]; do
 					sleep 60
 				done
-				curl -X PUT -d EM_OperatingMode=2 --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/configurations
-	                        echo
-			        statusMessage="SonnenBatterie now in auto mode: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge") RemainingCapacity_%:$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%"
-        	                test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage";
-				test $noNtfy && echo -e "$statusMessage";
+				statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
+				OPTIONS="--nontfy"
+				test $verbose && OPTIONS="-v $OPTIONS"
+				test $WBEC = true && until [ $(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '(.box[0].power | tonumber) > 0 and (.box[1].power | tonumber) > 0') ]; do
+					sh $0 $configPath $OPTIONS entlade_stop
+					sleep 60
+				done
+				OPTIONS=""
+				test $noNtfy && OPTIONS="--nontfy"
+				test $verbose && OPTIONS="-v $OPTIONS"
+				sh $0 $configPath $OPTIONS auto
 			};
 			;;
 	"auto")
