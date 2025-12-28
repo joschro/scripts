@@ -95,21 +95,25 @@ case $1 in
 				sleep $(echo "$myDuration * 60" | bc -l)
 				logger "WBEC: $WBEC"
 				if $WBEC; then
-					statusMessage="triggered" && until [[ "$statusMessage" != "triggered" ]]; do
+					statusMessage="triggered"
+					until [[ "$statusMessage" != "triggered" ]]; do
 						sleep 10
 						statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
 					done
 					test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
 					OPTIONS="--nontfy"
 					test $verbose && OPTIONS="-v $OPTIONS"
-					logger "Waiting for WBEC to finish charging"
-					while [ $(sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP) ]; do
-						sh $0 $configPath $OPTIONS entlade_stop
-						logger "Entladestopp"
+					while :; do
+						sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP || break
+						logger "WBEC: Waiting for WBEC to finish charging"
+						sh $0 $configPath $OPTIONS entlade_stop && logger "WBEC: Entladestopp"
 						sleep 360
 					done
+					statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+					logger "WBEC: $statusMessage"
+					test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
 				fi
-				logger "WBEC: continue"
+				logger "WBEC: done"
 				OPTIONS=""
 				test $noNtfy && OPTIONS="--nontfy"
 				test $verbose && OPTIONS="-v $OPTIONS"
@@ -132,24 +136,27 @@ case $1 in
 					sleep 300
 					currentCapacity="$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")"
 				done
-				statusMessage="triggered"
-			       	until [[ "$statusMessage" != "triggered" ]]; do
-					sleep 10
-					statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
-				done
-				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
-				OPTIONS="--nontfy"
-				test $verbose && OPTIONS="-v $OPTIONS"
 				logger "WBEC: $WBEC"
 				if $WBEC; then
-					logger "Waiting for WBEC to finish charging"
-					while [ $(sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP) ]; do
-						sh $0 $configPath $OPTIONS entlade_stop
-						logger "Entladestopp"
+					statusMessage="triggered"
+				       	until [[ "$statusMessage" != "triggered" ]]; do
+						sleep 10
+						statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+					done
+					test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
+					OPTIONS="--nontfy"
+					test $verbose && OPTIONS="-v $OPTIONS"
+					while :; do
+						sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP || break
+						logger "WBEC: Waiting for WBEC to finish charging"
+						sh $0 $configPath $OPTIONS entlade_stop && logger "WBEC: Entladestopp"
 						sleep 360
 					done
+					statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+					logger "WBEC: $statusMessage"
+					test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
 				fi
-				logger "WBEC: continue"
+				logger "WBEC: done"
 				OPTIONS=""
 				test $noNtfy && OPTIONS="--nontfy"
 				test $verbose && OPTIONS="-v $OPTIONS"
