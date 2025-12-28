@@ -93,14 +93,23 @@ case $1 in
 				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage"
 				test $noNtfy && echo -e "$statusMessage"
 				sleep $(echo "$myDuration * 60" | bc -l)
-				statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
-				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
-				OPTIONS="--nontfy"
-				test $verbose && OPTIONS="-v $OPTIONS"
-				test $WBEC = true && until [ $(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '(.box[0].power | tonumber) > 0 and (.box[1].power | tonumber) > 0') ]; do
-					sh $0 $configPath $OPTIONS entlade_stop
-					sleep 60
-				done
+				logger "WBEC: $WBEC"
+				if $WBEC; then
+					statusMessage="triggered" && until [[ "$statusMessage" != "triggered" ]]; do
+						sleep 10
+						statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+					done
+					test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
+					OPTIONS="--nontfy"
+					test $verbose && OPTIONS="-v $OPTIONS"
+					logger "Waiting for WBEC to finish charging"
+					while [ $(sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP) ]; do
+						sh $0 $configPath $OPTIONS entlade_stop
+						logger "Entladestopp"
+						sleep 360
+					done
+				fi
+				logger "WBEC: continue"
 				OPTIONS=""
 				test $noNtfy && OPTIONS="--nontfy"
 				test $verbose && OPTIONS="-v $OPTIONS"
@@ -110,17 +119,37 @@ case $1 in
 				statusMessage="SonnenBatterie now charging with ${chargingPower}W until ${myLoadLimit}%: $(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh\|OperatingMode\|discharge") RemainingCapacity_%:$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")%"
 				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "Sonnenbatterie status" "$statusMessage"
 				test $noNtfy && echo -e "$statusMessage"
-				until [ $(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n") -ge $myLoadLimit ]; do
-					sleep 60
+				lastCapacity=0
+				currentCapacity="$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")"
+				test $verbose && OPTIONS="-v"
+				until [ $currentCapacity -ge $myLoadLimit ]; do
+					test $currentCapacity -le $lastCapacity && {
+						sh $0 $configPath $OPTIONS auto
+						sleep 180
+						sh $0 $configPath $OPTIONS laden
+					}
+					lastCapacity=$currentCapacity
+					sleep 300
+					currentCapacity="$(echo "scale=14; 100 + ($(curl -s --header "$sonnenBattAPIToken" $sonnenBattAPIUrl/status | sed "s/,/\n/g" | grep -i "RemainingCapacity_Wh" | sed "s/\"RemainingCapacity_Wh\"://g") / 2 - $cap100) * (100 - $percentLow) / ($cap100 - $capLow)" | bc -l | xargs printf "%.0f\n")"
 				done
-				statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+				statusMessage="triggered"
+			       	until [[ "$statusMessage" != "triggered" ]]; do
+					sleep 10
+					statusMessage="$(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '.box[] | .power')"
+				done
 				test $noNtfy || ${ntfyPath}/ntfy.sh "$ntfyTopic" "WBEC status" "$statusMessage"
 				OPTIONS="--nontfy"
 				test $verbose && OPTIONS="-v $OPTIONS"
-				test $WBEC = true && until [ $(ping -c 3 -w 20 $WBEC_IP >/dev/null && curl -s "http://$WBEC_IP/json" | jq '(.box[0].power | tonumber) > 0 and (.box[1].power | tonumber) > 0') ]; do
-					sh $0 $configPath $OPTIONS entlade_stop
-					sleep 60
-				done
+				logger "WBEC: $WBEC"
+				if $WBEC; then
+					logger "Waiting for WBEC to finish charging"
+					while [ $(sh ~/bin/wbec-is-charging.sh --wbec $WBEC_IP) ]; do
+						sh $0 $configPath $OPTIONS entlade_stop
+						logger "Entladestopp"
+						sleep 360
+					done
+				fi
+				logger "WBEC: continue"
 				OPTIONS=""
 				test $noNtfy && OPTIONS="--nontfy"
 				test $verbose && OPTIONS="-v $OPTIONS"

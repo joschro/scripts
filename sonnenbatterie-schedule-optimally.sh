@@ -66,11 +66,16 @@ echo "timeEndS=$timeEndS"
 timeDiff="$(echo "($(date -d "9:00 today" '+%s') - $timeEndS) / 60" | bc)"
 echo timeDiff=$timeDiff
 percentGoal="$(echo "$percentGoal + ( $timeDiff / 60 ) * 5" | bc)"
-test $percentGoal -gt 95 && percentGoal=95
+test $percentGoal -gt 93 && percentGoal=93
 echo percentGoal=$percentGoal
 test $percentDiff -lt 1 && { echo "percentGoal ($percentGoal) is less than percentNow ($percentNow), nothing to do."; exit; }
 #exit
 runCMD="echo \"sh ~/bin/sonnenbatterie.sh ~/Projekte/github/private --wbec 192.168.178.102 --until $percentGoal laden\" | at -t $timeStart"
 echo "$runCMD"
 eval "$runCMD"
-${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "$(echo $runCMD | sed "s/\"//g")"
+${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "$(echo $runCMD | sed 's/\"//g')"
+#exit
+runCMD="echo \"/usr/bin/curl -s \\\"http://192.168.178.194/cm?cmnd=Power1%20ON\\\"\" | at -t $timeStart"
+echo "$runCMD"
+eval "$runCMD"
+${ntfyPath}/ntfy.sh "$ntfyTopic" 'at command scheduled' "$(echo $runCMD | sed 's/\"//g')"
