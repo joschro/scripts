@@ -6,7 +6,9 @@
 #sed -i "s/sfr.host_name = .*/sfr.host_name = \'vf10.uebbster.de:80\'/" /root/setup_data/setup.db
 sed -i "s/sfr.host_name = .*/sfr.host_name = \'berretto.eu\/uebbiweb\'/" /root/setup_data/setup.db
 
+mount -oremount,rw /dev/shm/tmp/mmcblk0p1
 mv -i /dev/shm/tmp/mmcblk0p1/update.sh /dev/shm/tmp/mmcblk0p1/update.sh-webby
+mount -oremount,ro /dev/shm/tmp/mmcblk0p1
 sync
 reboot
 
