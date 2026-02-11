@@ -8,8 +8,9 @@ test $# -gt 1 && PORT_NAME=$2
 
 BAUD="--baud 4800"
 BAUD="--baud 115200"
-BAUD="--no-stub"
+#BAUD="--no-stub"
 #BAUD="--baud 9600"
+#BAUD="--baud 460800"
 
 echo -n "To read chip ID,"
 echo -n " reset by pressing the device's connect/reset button, connect FTDI adapter and press <y> "; read ANSW
@@ -29,3 +30,4 @@ test "$ANSW" = "y" && {
 echo -n "To flash new firmware,"
 echo -n " reset by pressing the device's connect/reset button, connect FTDI adapter and press <y> "; read ANSW
 test "$ANSW" = "y" && esptool --port $PORT_NAME $BAUD write_flash --flash_size=4MB -fm dout 0x0 "$FLASH_FILE"
+#test "$ANSW" = "y" && esptool --port $PORT_NAME $BAUD --chip esp32c3 write_flash -z 0x0000 "$FLASH_FILE"

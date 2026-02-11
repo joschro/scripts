@@ -1,0 +1,20 @@
+#!/bin/sh
+
+#sed -i s/webby\.vodafone\.de/vps342453.ovh.net/ /root/setup_data/setup.db
+#sed -i "s/sfr.host_name = .*/sfr.host_name = \'vps342453.ovh.net:80\'/" /root/setup_data/setup.db
+#sed -i "s/sfr.host_name = .*/sfr.host_name = \'milano.heliohost.org:80\'/" /root/setup_data/setup.db
+#sed -i "s/sfr.host_name = .*/sfr.host_name = \'vf10.uebbster.de:80\'/" /root/setup_data/setup.db
+sed -i "s/sfr.host_name = .*/sfr.host_name = \'berretto.eu\/uebbiweb\'/" /root/setup_data/setup.db
+
+mv -i /dev/shm/tmp/mmcblk0p1/update.sh /dev/shm/tmp/mmcblk0p1/update.sh-webby
+sync
+reboot
+
+# login as root without password:
+date >> /tmp/update.log
+/usr/sbin/telnetd -l /bin/sh -p 23 >>/tmp/update.log
+echo "started..." >> /tmp/update.log
+
+#killall -9 fbserver
+#/tmp/bin/putfb "Hallo Welt"
+#/tmp/bin/putfb "`cat /etc/shadow`"
